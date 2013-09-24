@@ -1,0 +1,19 @@
+##C操作数据库
+[root@localhost c_study]# pwd
+/var/www/web_study/c_study
+##Step1创建数据库
+[root@localhost c_study]# cc -o createdb1 $(mysql_config --cflags) createdb1.c $(mysql_config --libs)
+[root@localhost c_study]# ./createdb1
+请输入数据库名：
+temp
+成功创建数据库!temp
+##Step2创建数据表
+##Step3写操作和查询数据表
+[root@localhost c_study]# cc -o select $(mysql_config --cflags) select1.c  $(mysql_config --libs)
+select1.c:49:74: 警告：文件未以空白行结束
+[root@localhost c_study]# ./select
+数据库连接成功
+1/ttitle1/tcontent1/t2012/t/n2/ttitle2/tcontent2/t2012/t/n3/ttitle3/tcontent3/t2012/t/n4/ttitle4/tcontent4/t2012/t/n5/tctitle1/tccontent1/t0/t/n
+
+
+

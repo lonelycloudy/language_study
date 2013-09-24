@@ -1,0 +1,50 @@
+##C++操作数据库
+##http://zhwj184.iteye.com/blog/579554
+编译和连接程序
+　　MySQL中有一个特殊的脚本,叫做mysql_config. 它会为你编译MySQL客户端,并连接到MySQL服务器提供有用的信息.你需要使用下面两个选项.
+
+　　1. --libs 选项 - 连接MySQL客户端函数库所需要的库和选项.
+
+　　$ mysql_config --libs
+
+　　2. --cflags 选项 - 使用必要的include文件的选项等等.
+
+　　$ mysql_config --cflags
+
+　　你需要将上面两个选项加入到对源文件的编译命令中. 所以,要编译上面的程序,要使用下面的命令:
+
+　　$ g++ -o output-file $(mysql_config --cflags) test.c $(mysql_config --libs)
+
+　　执行编译后的程序:
+
+　　$ ./output.file
+###step1
+[root@localhost cpp_study]# g++ -o1o $(mysql_config --cflags) 1.cpp  $(mysql_config --libs)
+[root@localhost cpp_study]# ./1o
+Select From Row test.cpp:
+id:1,title:title1,content:content1 
+
+###step2
+[root@localhost cpp_study]# g++ $(mysql_config --cflags) 2.cpp  $(mysql_config --libs)
+[root@localhost cpp_study]# ./a.out 
+MySQL Tables in mysql database:
+cpp_test 
+tt 
+Number of rows: 2
+field name Tables_in_test
+Field 0 is Tables_in_test
+character set information:
+character set name: utf8_general_ci
+collation name: utf8
+comment: UTF-8 Unicode
+directory: (null)
+multi byte character min. length: 1
+multi byte character max. length: 
+###step3
+[root@localhost cpp_study]# g++ -o3o $(mysql_config --cflags) 3.cpp $(mysql_config --libs)
+3.cpp:1: 错误：程序中有游离的 ‘\357’
+3.cpp:1: 错误：程序中有游离的 ‘\273’
+3.cpp:1: 错误：程序中有游离的 ‘\277’
+3.cpp:1: 错误：程序中有游离的 ‘#’
+3.cpp:50:66: 警告：文件未以空白行结束
+3.cpp:1: 错误：expected constructor, destructor, or type conversion before ‘<’ token

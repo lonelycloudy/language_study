@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, Activity07!</string>
+    <string name="app_name">activity07</string>
+    <string name="male">男</string>
+    <string name="female">女</string>
+    <string name="swim">swim</string>
+    <string name="run">run</string>
+    <string name="read">read</string>
+</resources>

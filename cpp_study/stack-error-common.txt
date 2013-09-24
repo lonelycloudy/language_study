@@ -1,0 +1,95 @@
+﻿段错误，程序员心中永远的痛
+http://jack.is-programmer.com/posts/11044.html
+ JACK posted @ 2009年9月04日 01:51 in programming with tags 段错误 core dumped gdb 调试 , 845 阅读
+
+         简而言之,产生段错误就是访问了错误的内存段，一般是你没有权限，或者根本就不存在对应的物理内存,尤其常见的是访问0地址.一般来说,段错误就是指访问的内存超出了系统所给这个程序的内存空间。
+
+        一般来说，linux下的调试工具有王牌调试工具gdb，内存检查工具valgrind等。另外，在linux下发生段错误是会产生core文件，可以用gdb来分析它，能很快地分析找到引起错误的函数和相应的函数。
+
+1 .设置发生段错误时产生core文件的方法：
+
+ 最简单的是在在bash的配置文件.bashrc里面加入一行
+ulimit -S -c unlimited > /dev/null 2>&1
+
+  然后注销一下就可以在发生段错误时产生core文件。
+
+  1）使用
+
+ulimit -c
+  命令可查看core文件的生成开关。若结果为0，则表示关闭了此功能，不会生成core文件。
+   2）使用    
+ulimit -c filesize
+命令，可以限制core文件的大小（filesize的单位为kbyte）。若
+
+ulimit -c unlimited
+则表示core文件的大小不受限制。如果生成的信息超过此大小，将会被裁剪，最终生成一个不完整的core文件。在调试此core文 件的时候，gdb会提示错误。
+
+2.core文件的名称和生成路径
+ ----------------------------
+core文件生成路径:
+输入可执行文件运行命令的同一路径下。
+若系统生成的core文件不带其它任何扩展名称，则全部命名为core。新的core文件生成将覆盖原来的core文件。
+
+1）/proc/sys/kernel/core_uses_pid可以控制core文件的文件名中是否添加pid作为扩展。文件内容为1，表示添加pid作为扩展 名，生成的core文件格式为core.xxxx；为0则表示生成的core文件同一命名为core。
+可通过以下命令修改此文件：
+echo "1" > /proc/sys/kernel/core_uses_pid
+
+2）proc/sys/kernel/core_pattern可以控制core文件保存位置和文件名格式。
+可通过以下命令修改此文件：
+echo "/corefile/core-%e-%p-%t" > core_pattern
+
+可以将core文件统一生成到/corefile目录下，产生的文件名为core-命令名-pid-时间戳
+以下是参数列表:
+    %p - insert pid into filename 添加pid
+    %u - insert current uid into filename 添加当前uid
+    %g - insert current gid into filename 添加当前gid
+    %s - insert signal that caused the coredump into the filename 添加导致产生core的信号
+    %t - insert UNIX time that the coredump occurred into filename 添加core文件生成时的unix时间
+    %h - insert hostname where the coredump happened into filename 添加主机名
+    %e - insert coredumping executable name into filename 添加命令名
+
+3.core文件的查看
+
+core文件要通过gdb查看。
+
+gdb
+GNU gdb 6.8-debian
+Copyright (C) 2008 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "i486-linux-gnu".
+
+(gdb)
+
+然后输入
+
+core-file core.*
+就可以看到一些段错误的信息了。
+
+Program terminated with signal 11, Segmentation fault.
+[New process 6285]
+#0  0xb7fa9e7f in ?? ()
+然后再输入
+bt
+
+就可以出来函数及行数信息了。
+#0  0xb7fa9e7f in ?? ()
+#1  0xb7fa9efd in ?? ()
+#2  0x0809a393 in std::_Rb_tree_const_iterator<std::pair<perception::Vision::FID const, math::TVector<float, 3u> > >::operator-- (this=0xbfecf7e0)
+    at /usr/include/c++/4.3/bits/stl_tree.h:272
+#3  0x0809a407 in getSecondRefByFirstValue<perception::Vision::FID, math::TVector<float, 3u> > (m=@0x9a32c84, f=perception::Vision::BALL)
+    at ../../../src/lib/Template.hpp:92
+#4  0x0809a441 in perception::Vision::pos (this=0x9a32c68,
+    oid=perception::Vision::BALL) at ../perception/Vision.h:95
+#5  0x0808ef9d in core::WorldModel::updateBall (this=0x817aba0)
+    at WorldModel.cpp:447
+#6  0x08095009 in core::WorldModel::update (this=0x817aba0, p=
+        {px = 0xbfecfa5c, pn = {pi_ = 0x9a2ed84}}) at WorldModel.cpp:88
+#7  0x08088863 in core::Agent::run (this=0x817a580) at Agent.cpp:101
+#8  0x08055159 in main (argc=2, argv=0xbfecfb64) at main.cpp:3
+
+从main函数开始一直向上就可以锁定发生段错误的位置了。解下来就可以解决段错误了。
+
+注意：待调试的可执行文件，在编译的时候需要加-g，core文件才能正常显示出错信息！

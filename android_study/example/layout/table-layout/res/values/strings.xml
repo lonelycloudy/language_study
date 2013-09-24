@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, TableTest!</string>
+    <string name="app_name">layout02</string>
+    <string name="row1_column1">row1_column1</string>
+    <string name="row1_column2">row1_column2</string>
+    <string name="row2_column1">row2_column1</string>
+    <string name="row2_column2">row2_column2</string>
+</resources>

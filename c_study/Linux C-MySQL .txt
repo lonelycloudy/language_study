@@ -1,0 +1,268 @@
+﻿
+
+1.MySQL数据库简介
+
+MySQL是一个开源码的小型关系数据库管理系统，体积小，速度快，总体成本低，开源。MySQL有以下特性:
+
+(1) 使用C和C++编写，并使用了多种编译器进行测试，保证源码的可移植性。
+
+(2) 支持多线程,利用CPU资源，支持多用户。
+
+(3) 可以处理拥有上千万条记录的大型数据库。
+
+(4)既可以作为一个单独的应用程序应用在客户端服务器网络环境中，也能够作为 一个库而嵌入到其他软件中去。
+
+ 
+
+2. MySQL数据库的安装 安装MySQL数据库需要三个软件包:
+
+(1)服务器
+
+(2)客户端
+
+(3) 开发库－如果用C或C语言开发，就得安装开发库。
+
+MySQL-server-5.5.8-1.rhel5.i386.rpm
+
+MySQL-client-5.5.8-1.rhel5.i386.rpm
+
+MySQL-devel-5.5.8-1.rhel5.i386.rpm 在Linux下用rpm -ivh 安装即可。
+
+ 
+
+3. MySQL的相关目录
+
+/usr/bin MySQL客户端程序或脚本
+
+/usr/sbin mysqld服务器相关程序
+
+/var/lib/mysql 日志文件，数据库数据文件存放目录
+
+/usr/share/doc/packages 使用手册，开发文档存放目录
+
+/usr/include/mysql 接口函数库头文件存放目录
+
+/usr/lib/mysql 接口函数动态链接库存放目录
+
+/usr/share/mysql 错误消息和字符集文件存放目录
+
+/usr/share/sql-bench 基本程序存放目录
+
+ 
+
+4. MySQL数据库的基本操作
+
+(1)启动MySQL服务器 service mysql start
+
+(2) 停止MySQL服务器 service mysql stop
+
+(3)root用户指的是MySQL数据库下的root目录而不是Linux下的root用户
+
+为root用户添加密码: mysqladmin -u root password 123 //为root用户添加了新密码123
+
+修改root用户密码为234: mysqladmin -u root -p password 234
+
+Enter password:
+
+或者是: mysqladmin -u root -p password
+
+Enter password:
+
+New password:
+
+Confirm new password:
+
+(4)建立数据库和表
+
+首先进入用户下，如在root用户下建立一个db_record的数据库: mysql -u root -p
+
+Enter password:
+
+create database db_record
+
+然后切换到当前数据库下，建立表: use db_record create table friends ( name Char(15),telephone VarChar(20));
+
+最后向表中插入数据 insert into friends (name,telephone) Values ("john","222");
+
+查询: select * from friends;
+
+(5)建立,删除用户及授权
+
+insert into mysql.user(Host,User,Password) values("localhost","min",password("123"));
+
+ flush privileges; //刷新权限列表
+
+grant all privileges on tree.* to min@localhost identified by '123'; //授权min用户拥有tree数据库的所有权
+
+ 也可以: grant select, insert,update,delete on db_record.* to min@localhost identified by '123';
+
+ 删除用户: 将该用户的记录从MySQL数据库删除:
+
+use mysql //切换数据库
+
+delete from user where user='min' and host='localhost'; //删除min用户的记录
+
+flush privileges; //刷新权限
+
+ 
+
+5. C语言操作MySQL数据库
+
+步骤:
+
+(1)初始化MySQL库，库可以是mysqlclient C客户端库，或mysqld嵌入式服务器库,函数 mysql_library_init(),对于与客户端链接的应用程序，提供了改进内存管理的功能。
+
+(2)初始化连接处理程序 mysql_init();主要是用来初始化数据库标识符，为连接准备
+
+(3)连接到MySQL服务器，mysql_real_connect()函数。
+
+(4) 调用 mysql_close()关闭与MySQL服务器的连接
+
+(5)调用mysql_library_end()函数结束MySQL库的使用，包括释放内存，防止内存泄露等操作。
+
+ 
+
+下面是用C语言操作MySQL数据库的例子:
+
+ 
+
+/**
+1.连接与查询MySQL数据库
+连接MySQ数据库步骤:
+(1) 调用mysql_library_init()初始化MySQL数据库，提供初始化数据库管理，对于与客户端链接的应用程序，提供了改进的内存管理功能
+(2)mysql_init()初始化连接处理程序，并调用mysql_real_connect()函数连接到MySQL服务器
+(3)mysql_close()函数关闭与MySQL服务器的连接
+(4)mysql_libary_end函数结束MySQL库的使用，包括释放内存等操作
+mysql_library_init(int argc,char**argv,char**groups)//用来接收应用程序传递的参数，如果应用程序不传递参数，那么argc=0，argv指针数组中的第一个参数是应用程序名
+groups是以NULL为终结的字符串列表中选择了选项文件中的活动的groups,groups也可以为NULL
+mysql_init(MYSQL*mysql)传递的参数是数据库标识符,用于分配或初始化与mysql_real_connect相适应的MYSQL对象，如果mysql的实际参数为NULL指针，将分配初始化新对象，否则初始化对象，并返回对象的地址
+mysql_real_connect(MYSQL *mysql,const char* host,const char* user,const char* passwd,const char* db,unsigned int port,const char* unix_socket,unsigned long client_flag)
+//尝试与运行在主机上的MYSQL数据库引擎建立连接
+//第一个参数是可用的MYSQL结构地址，host必须为主机名或ip,如果为NULL或localhost被视为本地主机，user为用户名，passwd为密码，db是数据库名，port为端口号，unix_socket为应使用的套接字，client_flag参数值通常为0
+mysql_close(MYSQL*mysql)//关闭连接，释放对象的内存空间
+mysql_library_end()如果不调用该函数，可能造成内存泄露
+
+2.MySQL函数使用
+查询MYSQL数据库: int mysql_query(MYSQL*mysql,const char* query)
+               int mysql_real_query(MYSQL *mysql,const char* query,unsinged long length)
+//mysql_query函数是以NULL为终结的字符串查询指向的SQL查询，不应该为语句加中;或/g
+//而mysql_real_query是以计数字符串为终结的查询
+如果查询字符串包含二进制数据，只能用mysql_real_query,因为二进制数据可能包含/0，导致计算字符串的长度不正确
+mysql_real_query比mysql_query快，因为后者需要strlen计算查询字符串的长度
+
+MYSQL_RES *mysql_store_result(MYSQL *mysql)
+MYSQL_RES *mysql_use_result(MYSQL *mysql)
+//mysql_store_result将查询的结果集全部读取到客户端，并放于1个MYSQL_RES的结构中去,如果读取失败将返回NULL指针
+//mysql_use_result函数是初始化结果集检索，而不是将数据读取到客户端，它必须通过mysql_fetch_row()函数对每一行进行检索
+//与mysql_store_result相比，每次只读取一行，所以速度快，而且不用缓存，内存占用少，仅对当前行与通信缓冲区分配内存即可
+MYSQL_ROW mysql_fetch_row(MYSQL_RES*result)//实际检索来自服务器的行，检索结果集的下一行
+unsigned long *mysql_fetch_lengths(MYSQL_RES *result)//用来返回当前行中的列的长度，该长度有助于信息的优化，能避免用strlen函数,对于包含二数据的结果集，只能用这个函数
+void mysql_free_result(MYSQL_RES*result) 函数释放为mysql_store_result,mysql_use_result分配的结果集内存
+
+mysql_store_result把所有查询的结果都返回给了客户端，不仅能连续访问查询结果，还能用mysql_row_seek()函数在结果集中向前或向后移动、
+还可以调用 mysql_num_rows()来发现有多少行
+另一方面，如果数据很大，可能造成内存溢出
+mysql_use_result客户端用于保存查询结果集的内存较少，每次只返回一条，所以速度比前者快
+但不能随机访问结果集，只能顺序存取，也不能知道查询结构的总行数
+必须快速的处理查询结构，否则影响服务器的性能，因为查询操作的会话依然存在
+**/
+//gcc -g -o  mysql mysql1.c -I/usr/include/mysql -L/usr/lib -lmysqlclient -lpthread -lm -lrt -ldl
+//$(mysql_config --cflags) $(mysql_config --libs)
+
+#include <mysql.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+static char* server_groups[]={"embedded","server","this_program_server",(char*)NULL};
+int main(){
+
+MYSQL mysql;
+MYSQL_RES *res;
+MYSQL_ROW row;
+char sqlcmd[200];
+int t,r;
+mysql_library_init(0,NULL,server_groups);//初始化MYSQL数据库
+mysql_init(&mysql);//初始化MYSQL标识符，用于连接
+if(!mysql_real_connect(&mysql,"localhost","root","root","db_record",0,NULL,0)){
+  fprintf(stderr,"无法连接到数据库，错误原因是:%s/n",mysql_error(&mysql));
+
+}
+else {
+ puts("数据库连接成功");
+//首先向数据库中插入一条记录
+ sprintf(sqlcmd,"%s","insert into friends (name,telephone) Values ('xx','xx')");
+ mysql_query(&mysql,sqlcmd);
+ sprintf(sqlcmd,"%s","select * from friends");
+ t=mysql_real_query(&mysql,sqlcmd,(unsigned int)strlen(sqlcmd));
+
+ if(t){
+ printf("查询数据库失败%s/n",mysql_error(&mysql));
+}
+else {
+res=mysql_store_result(&mysql);//返回查询的全部结果集
+while(row=mysql_fetch_row(res)){//mysql_fetch_row取结果集的下一行
+ for(t=0;t<mysql_num_fields(res);t++){//结果集的列的数量
+  printf("%s/t",row[t]);
+ }
+ printf("/n");
+
+}
+
+mysql_free_result(res);//操作完毕，查询结果集
+}
+mysql_close(&mysql);//关闭数据库连接
+
+}
+
+mysql_library_end();//关闭MySQL库
+
+return EXIT_SUCCESS;
+}
+
+
+
+编译链接:
+
+gcc -g -o  mysql mysql1.c -I/usr/include/mysql -L/usr/lib -lmysqlclient -lpthread -lm -lrt -ldl
+
+也可以: gcc -g -o mysql mysql.c $(mysql_config --cflags) $(mysql_config --libs)
+
+解释:
+
+(1) mysql_config --cflags 寻找mysql编译相关的头文件等信息。
+
+(2) mysql_config --libs   寻找mysql编译所需要的库函数。
+
+(3) -L/usr/lib 指出静态库寻找的路径。在这里也可以不写，因为系统会去默认的/lib,/usr/lib去寻找库函数。如果libmysqlclient.a在/usr/lib/mysql下，那么-L/usr/lib/mysql 这个目录。
+
+(4)非标准的库函数，链接时用-lmysqlclient.原库名为libmysqlclient.a去掉lib和.a。
+
+(5) -I是包含头文件等信息，及include .
+(6) 动态链接库的寻找顺序:
+
+a. LD_LIBRARY_PATH设置的目录下.
+
+b. /etc/ld.so.conf 加到这个文件中的目录。
+
+c. 默认的 /usr/lib,/lib目录下。
+
+(7)头文件的寻找顺序
+
+a. -I所指定的目录中去寻找 
+
+b.gcc的环境变量指定的目录
+C_INCLUDE_PATH, CPLUS_INCLUDE_PATH, OBJC_INCLUDE_PATH
+c. /usr/include /usr/local/include 等目录下寻找。
+
+(8)静态库的寻找顺序
+
+a. -L所指定的静态库寻找路径
+
+b.gcc环境变量LIBRARY_PATH
+
+c. /lib ,/usr/lib,/usr/local/lib
+
+如果MySQL数据库启动不起来，可以先执行killall mysqld ，然后再用service mysql start试试。
+
+关于MySQL数据库的基本操作就总结到这里了。
+

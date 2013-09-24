@@ -1,0 +1,54 @@
+﻿初学c++遇到这样一个问题：
+http://q.cnblogs.com/q/36246/
+
+Layer1/2/3 都继承自Layer123，现在需要在switch中根据变量i的值不同来分别实例化不同的类，由于作用域的存在，实例化的layer到switch的 “}” 后就没了，所以需要在switch之前声明，这个地方该如何声明呢(L10)？给什么类型呢？
+
+class Layer123 {};
+ 2 class Layer1 : Layer123{};
+ 3 class Layer2 : Layer123{};
+ 4 class Layer3 : Layer123{};
+ 5 
+ 6 //............
+ 7 int main(){
+ 8     int i;
+ 9     // i = .....
+10     // void layer;
+11     switch(i)
+12     {
+13         case 1:
+14             Layer1 layer();
+15             break;
+16         case 2:
+17             Layer2 layer();
+18             break;
+19         case 3:
+20             Layer3 layer();
+21             break;
+22         default:
+23             return 1;
+24     }
+25 
+26     layer.foo();
+27     return 0;
+28 }
+
+另外麻烦推荐几本真心好的c++入门或进阶书籍，谢谢~~~~^_^
+
+######
+0
+
+Layer123 *pLayer;
+
+switch(i)     
+{
+ case 1:
+　　pLayer= new Layer1();
+
+ break;
+
+...
+
+pLayer->foo();
+delete pLayer;
+
+这正是多态使用的地方，必须使用指针，否则会切片；指针可以使用智能指针

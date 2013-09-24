@@ -1,0 +1,3 @@
+﻿gcc -g -fgnu-runtime -O -c some_class.m
+g++ –o test source1.cc source2.cc
+g++ -o test test.c 

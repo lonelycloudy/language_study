@@ -1,0 +1,107 @@
+﻿Linux C创建MySQL数据库出现段错误
+http://www.bhcode.net/article/20110118/14752.html
+
+大家好，想请教一下各位几个段错误的问题。代码如下：
+
+createdb.c
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <mysql/mysql.h>
+#include <syslog.h>
+MYSQL mysql;
+int main()
+{
+char *db=malloc(30),*user="root",*password="zxy2008",*host="localhost",*sql=malloc(300);
+//char db_arr[30]={0};
+db=NULL;
+if(mysql_init(&mysql)==NULL)
+{
+printf("初始化MySQL数据库失败！\n");
+return -1;
+}
+if(mysql_real_connect(&mysql,host,user,password,db,0,NULL,0)==NULL)
+{
+printf("连接MySQL数据库失败：%s!",mysql_error(&mysql));
+return -1;
+}
+printf("请输入数据库名：\n");
+scanf("%s",db);
+//strcpy(db_arr,db);
+sprintf(sql,"create database if not exists `%s`",db);
+if(mysql_query(&mysql,sql))
+{
+printf("创建数据库失败：%s!\n",mysql_error(&mysql));
+return -1;
+}
+printf("成功创建数据库!%s\n",db);
+return 0;
+}
+编译：cc -o createdb $(mysql_config --cflags) createdb.c $(mysql_config --libs)
+执行：./createdb
+运行结果：
+请输入数据库名：
+zend
+成功创建数据库!(null)
+为什么会出现“成功创建数据库!(null)”呢？
+还有一个问题：将//char db_arr[30]={0};和//strcpy(db_arr,db);的注释去掉并将printf("成功创建数据库!%s\n",db);改为printf("成功创建数据库!%s\n",db_arr);执行结果如下：
+请输入数据库名：
+ioy
+段错误
+为什么会出现段错误呢？
+如果我将代码改为如下：
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <mysql/mysql.h>
+#include <syslog.h>
+MYSQL mysql;
+int main()
+{
+char *user="root",*password="zxy2008",*host="localhost",*sql=malloc(300),db[30]={0};
+if(mysql_init(&mysql)==NULL)
+{
+printf("初始化MySQL数据库失败！\n");
+return -1;
+}
+if(mysql_real_connect(&mysql,host,user,password,db,0,NULL,0)==NULL)
+{
+printf("连接MySQL数据库失败：%s!",mysql_error(&mysql));
+return -1;
+}
+printf("请输入数据库名：\n");
+scanf("%s",db);
+//strcpy(db_arr,db);
+sprintf(sql,"create database if not exists `%s`",db);
+if(mysql_query(&mysql,sql))
+{
+printf("创建数据库失败：%s!\n",mysql_error(&mysql));
+return -1;
+}
+printf("成功创建数据库!%s\n",db);
+return 0;
+}
+运行结果为：
+请输入数据库名：
+zend
+成功创建数据库!zend
+但是我将db[30]={0}改为db[30]同样也会出现段错误。为什么呢？
+我想用*db来存取数据库名，也就是将db[30]改为*db，并且scanf("%s",db);中的db为*db，而非db[30]并得到如下结果：
+请输入数据库名：
+zend
+成功创建数据库!zend
+该如何改这段代码？真心希望各位帮忙解决一下，在此我先说声谢谢。 char *db=malloc(30),*user="root",*password="zxy2008",*host="localhost",*sql=malloc(300);
+//char db_arr[30]={0};
+db=NULL;
+上一句给分配内存块，由指针db指向，为什么后面又把db指空？
+
+这样原先db指向的内存就是垃圾内存了。相反，分配内存之后，要进行判断
+if(db==NULL) {
+  printf("内存分配失败!\n");
+  exit(1);
+}
+你后面的操作都是对空指针进行操作。
+
+果然如你所言。谢谢了。这么简单的一个问题我都想不到，真是惭愧。
+
+本文地址：http://www.bhcode.net/article/20110118/14752.html

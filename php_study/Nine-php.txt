@@ -1,0 +1,928 @@
+<?php
+/**
+http://net.tutsplus.com/tutorials/php/9-useful-php-functions-and-features-you-need-to-know/
+9 Useful PHP Functions and Features You Need to Know 
+	Burak Guzel on Feb 28th 2011 with 140 comments 
+*/
+/**
+Twice a month, we revisit some of our readers¡¯ favorite posts from throughout the history of Nettuts+.
+Even after using PHP for years, we stumble upon functions and features that we did not know about. 
+Some of these can be quite useful, yet underused. With that in mind, 
+I¡¯ve compiled a list of nine incredibly useful PHP functions and features that you should be familiar with.	
+*/
+/**
+1. Functions with Arbitrary Number of Arguments
+
+You may already know that PHP allows you to define functions with optional arguments. But there is also a method for allowing completely arbitrary number of function arguments.
+
+First, here is an example with just optional arguments:
+view plaincopy to clipboardprint?
+*/
+   1. // function with 2 optional arguments  
+   2. function foo($arg1 = '', $arg2 = '') {  
+   3.   
+   4.     echo "arg1: $arg1\n";  
+   5.     echo "arg2: $arg2\n";  
+   6.   
+   7. }  
+   8.   
+   9. foo('hello','world');  
+  10. /* prints: 
+  11. arg1: hello 
+  12. arg2: world 
+  13. */  
+  14.   
+  15. foo();  
+  16. /* prints: 
+  17. arg1: 
+  18. arg2: 
+  19. */  
+
+// function with 2 optional arguments
+function foo($arg1 = '', $arg2 = '') {
+
+	echo "arg1: $arg1\n";
+	echo "arg2: $arg2\n";
+
+}
+
+foo('hello','world');
+/* prints:
+arg1: hello
+arg2: world
+*/
+
+foo();
+/* prints:
+arg1:
+arg2:
+*/
+/**
+Now, let¡¯s see how we can build a function that accepts any number of arguments. This time we are going to utilize func_get_args():
+view plaincopy to clipboardprint?
+*/
+   1. // yes, the argument list can be empty  
+   2. function foo() {  
+   3.   
+   4.     // returns an array of all passed arguments  
+   5.     $args = func_get_args();  
+   6.   
+   7.     foreach ($args as $k => $v) {  
+   8.         echo "arg".($k+1).": $v\n";  
+   9.     }  
+  10.   
+  11. }  
+  12.   
+  13. foo();  
+  14. /* prints nothing */  
+  15.   
+  16. foo('hello');  
+  17. /* prints 
+  18. arg1: hello 
+  19. */  
+  20.   
+  21. foo('hello', 'world', 'again');  
+  22. /* prints 
+  23. arg1: hello 
+  24. arg2: world 
+  25. arg3: again 
+  26. */  
+
+// yes, the argument list can be empty
+function foo() {
+
+	// returns an array of all passed arguments
+	$args = func_get_args();
+
+	foreach ($args as $k => $v) {
+		echo "arg".($k+1).": $v\n";
+	}
+
+}
+
+foo();
+/* prints nothing */
+
+foo('hello');
+/* prints
+arg1: hello
+*/
+
+foo('hello', 'world', 'again');
+/* prints
+arg1: hello
+arg2: world
+arg3: again
+*/
+/**
+2. Using Glob() to Find Files
+
+Many PHP functions have long and descriptive names. However it may be hard to tell what a function named glob() does unless you are already familiar with that term from elsewhere.
+
+Think of it like a more capable version of the scandir() function. It can let you search for files by using patterns.
+view plaincopy to clipboardprint?
+*/
+   1. // get all php files  
+   2. $files = glob('*.php');  
+   3.   
+   4. print_r($files);  
+   5. /* output looks like: 
+   6. Array 
+   7. ( 
+   8.     [0] => phptest.php 
+   9.     [1] => pi.php 
+  10.     [2] => post_output.php 
+  11.     [3] => test.php 
+  12. ) 
+  13. */  
+
+// get all php files
+$files = glob('*.php');
+
+print_r($files);
+/* output looks like:
+Array
+(
+    [0] => phptest.php
+    [1] => pi.php
+    [2] => post_output.php
+    [3] => test.php
+)
+*/
+
+/**
+You can fetch multiple file types like this:
+view plaincopy to clipboardprint?
+*/
+   1. // get all php files AND txt files  
+   2. $files = glob('*.{php,txt}', GLOB_BRACE);  
+   3.   
+   4. print_r($files);  
+   5. /* output looks like: 
+   6. Array 
+   7. ( 
+   8.     [0] => phptest.php 
+   9.     [1] => pi.php 
+  10.     [2] => post_output.php 
+  11.     [3] => test.php 
+  12.     [4] => log.txt 
+  13.     [5] => test.txt 
+  14. ) 
+  15. */  
+
+// get all php files AND txt files
+$files = glob('*.{php,txt}', GLOB_BRACE);
+
+print_r($files);
+/* output looks like:
+Array
+(
+    [0] => phptest.php
+    [1] => pi.php
+    [2] => post_output.php
+    [3] => test.php
+    [4] => log.txt
+    [5] => test.txt
+)
+*/
+/**
+Note that the files can actually be returned with a path, depending on your query:
+view plaincopy to clipboardprint?
+*/
+   1. $files = glob('../images/a*.jpg');  
+   2.   
+   3. print_r($files);  
+   4. /* output looks like: 
+   5. Array 
+   6. ( 
+   7.     [0] => ../images/apple.jpg 
+   8.     [1] => ../images/art.jpg 
+   9. ) 
+  10. */  
+
+$files = glob('../images/a*.jpg');
+
+print_r($files);
+/* output looks like:
+Array
+(
+    [0] => ../images/apple.jpg
+    [1] => ../images/art.jpg
+)
+*/
+/**
+If you want to get the full path to each file, you can just call the realpath() function on the returned values:
+view plaincopy to clipboardprint?
+*/
+   1. $files = glob('../images/a*.jpg');  
+   2.   
+   3. // applies the function to each array element  
+   4. $files = array_map('realpath',$files);  
+   5.   
+   6. print_r($files);  
+   7. /* output looks like: 
+   8. Array 
+   9. ( 
+  10.     [0] => C:\wamp\www\images\apple.jpg 
+  11.     [1] => C:\wamp\www\images\art.jpg 
+  12. ) 
+  13. */  
+
+$files = glob('../images/a*.jpg');
+
+// applies the function to each array element
+$files = array_map('realpath',$files);
+
+print_r($files);
+/* output looks like:
+Array
+(
+    [0] => C:\wamp\www\images\apple.jpg
+    [1] => C:\wamp\www\images\art.jpg
+)
+*/
+
+/**
+3. Memory Usage Information
+
+By observing the memory usage of your scripts, you may be able optimize your code better.
+
+PHP has a garbage collector and a pretty complex memory manager. The amount of memory being used by your script. can go up and down during the execution of a script. To get the current memory usage, we can use the memory_get_usage() function, and to get the highest amount of memory used at any point, we can use the memory_get_peak_usage() function.
+view plaincopy to clipboardprint?
+*/
+   1. echo "Initial: ".memory_get_usage()." bytes \n";  
+   2. /* prints 
+   3. Initial: 361400 bytes 
+   4. */  
+   5.   
+   6. // let's use up some memory  
+   7. for ($i = 0; $i < 100000; $i++) {  
+   8.     $array []= md5($i);  
+   9. }  
+  10.   
+  11. // let's remove half of the array  
+  12. for ($i = 0; $i < 100000; $i++) {  
+  13.     unset($array[$i]);  
+  14. }  
+  15.   
+  16. echo "Final: ".memory_get_usage()." bytes \n";  
+  17. /* prints 
+  18. Final: 885912 bytes 
+  19. */  
+  20.   
+  21. echo "Peak: ".memory_get_peak_usage()." bytes \n";  
+  22. /* prints 
+  23. Peak: 13687072 bytes 
+  24. */  
+
+echo "Initial: ".memory_get_usage()." bytes \n";
+/* prints
+Initial: 361400 bytes
+*/
+
+// let's use up some memory
+for ($i = 0; $i < 100000; $i++) {
+	$array []= md5($i);
+}
+
+// let's remove half of the array
+for ($i = 0; $i < 100000; $i++) {
+	unset($array[$i]);
+}
+
+echo "Final: ".memory_get_usage()." bytes \n";
+/* prints
+Final: 885912 bytes
+*/
+
+echo "Peak: ".memory_get_peak_usage()." bytes \n";
+/* prints
+Peak: 13687072 bytes
+*/
+/**
+4. CPU Usage Information
+
+For this, we are going to utilize the getrusage() function. Keep in mind that this is not available on Windows platforms.
+view plaincopy to clipboardprint?
+*/
+   1. print_r(getrusage());  
+   2. /* prints 
+   3. Array 
+   4. ( 
+   5.     [ru_oublock] => 0 
+   6.     [ru_inblock] => 0 
+   7.     [ru_msgsnd] => 2 
+   8.     [ru_msgrcv] => 3 
+   9.     [ru_maxrss] => 12692 
+  10.     [ru_ixrss] => 764 
+  11.     [ru_idrss] => 3864 
+  12.     [ru_minflt] => 94 
+  13.     [ru_majflt] => 0 
+  14.     [ru_nsignals] => 1 
+  15.     [ru_nvcsw] => 67 
+  16.     [ru_nivcsw] => 4 
+  17.     [ru_nswap] => 0 
+  18.     [ru_utime.tv_usec] => 0 
+  19.     [ru_utime.tv_sec] => 0 
+  20.     [ru_stime.tv_usec] => 6269 
+  21.     [ru_stime.tv_sec] => 0 
+  22. ) 
+  23.  
+  24. */  
+
+print_r(getrusage());
+/* prints
+Array
+(
+    [ru_oublock] => 0
+    [ru_inblock] => 0
+    [ru_msgsnd] => 2
+    [ru_msgrcv] => 3
+    [ru_maxrss] => 12692
+    [ru_ixrss] => 764
+    [ru_idrss] => 3864
+    [ru_minflt] => 94
+    [ru_majflt] => 0
+    [ru_nsignals] => 1
+    [ru_nvcsw] => 67
+    [ru_nivcsw] => 4
+    [ru_nswap] => 0
+    [ru_utime.tv_usec] => 0
+    [ru_utime.tv_sec] => 0
+    [ru_stime.tv_usec] => 6269
+    [ru_stime.tv_sec] => 0
+)
+
+*/
+/**
+That may look a bit cryptic unless you already have a system administration background. Here is the explanation of each value (you don't need to memorize these):
+
+    * ru_oublock: block output operations
+    * ru_inblock: block input operations
+    * ru_msgsnd: messages sent
+    * ru_msgrcv: messages received
+    * ru_maxrss: maximum resident set size
+    * ru_ixrss: integral shared memory size
+    * ru_idrss: integral unshared data size
+    * ru_minflt: page reclaims
+    * ru_majflt: page faults
+    * ru_nsignals: signals received
+    * ru_nvcsw: voluntary context switches
+    * ru_nivcsw: involuntary context switches
+    * ru_nswap: swaps
+    * ru_utime.tv_usec: user time used (microseconds)
+    * ru_utime.tv_sec: user time used (seconds)
+    * ru_stime.tv_usec: system time used (microseconds)
+    * ru_stime.tv_sec: system time used (seconds)
+
+To see how much CPU power the script has consumed, we need to look at the 'user time' and 'system time' values. The seconds and microseconds portions are provided separately by default. You can divide the microseconds value by 1 million, and add it to the seconds value, to get the total seconds as a decimal number.
+
+Let's see an example:
+view plaincopy to clipboardprint?
+*/
+   1. // sleep for 3 seconds (non-busy)  
+   2. sleep(3);  
+   3.   
+   4. $data = getrusage();  
+   5. echo "User time: ".  
+   6.     ($data['ru_utime.tv_sec'] +  
+   7.     $data['ru_utime.tv_usec'] / 1000000);  
+   8. echo "System time: ".  
+   9.     ($data['ru_stime.tv_sec'] +  
+  10.     $data['ru_stime.tv_usec'] / 1000000);  
+  11.   
+  12. /* prints 
+  13. User time: 0.011552 
+  14. System time: 0 
+  15. */  
+
+// sleep for 3 seconds (non-busy)
+sleep(3);
+
+$data = getrusage();
+echo "User time: ".
+	($data['ru_utime.tv_sec'] +
+	$data['ru_utime.tv_usec'] / 1000000);
+echo "System time: ".
+	($data['ru_stime.tv_sec'] +
+	$data['ru_stime.tv_usec'] / 1000000);
+
+/* prints
+User time: 0.011552
+System time: 0
+*/
+/**
+Even though the script took about 3 seconds to run, the CPU usage was very very low. Because during the sleep operation, the script actually does not consume CPU resources. There are many other tasks that may take real time, but may not use CPU time, like waiting for disk operations. So as you see, the CPU usage and the actual length of the runtime are not always the same.
+
+Here is another example:
+view plaincopy to clipboardprint?
+*/
+   1. // loop 10 million times (busy)  
+   2. for($i=0;$i<10000000;$i++) {  
+   3.   
+   4. }  
+   5.   
+   6. $data = getrusage();  
+   7. echo "User time: ".  
+   8.     ($data['ru_utime.tv_sec'] +  
+   9.     $data['ru_utime.tv_usec'] / 1000000);  
+  10. echo "System time: ".  
+  11.     ($data['ru_stime.tv_sec'] +  
+  12.     $data['ru_stime.tv_usec'] / 1000000);  
+  13.   
+  14. /* prints 
+  15. User time: 1.424592 
+  16. System time: 0.004204 
+  17. */  
+
+// loop 10 million times (busy)
+for($i=0;$i<10000000;$i++) {
+
+}
+
+$data = getrusage();
+echo "User time: ".
+	($data['ru_utime.tv_sec'] +
+	$data['ru_utime.tv_usec'] / 1000000);
+echo "System time: ".
+	($data['ru_stime.tv_sec'] +
+	$data['ru_stime.tv_usec'] / 1000000);
+
+/* prints
+User time: 1.424592
+System time: 0.004204
+*/
+
+/**
+That took about 1.4 seconds of CPU time, almost all of which was user time, since there were no system calls.
+
+System Time is the amount of time the CPU spends performing system calls for the kernel on the program's behalf. Here is an example of that:
+view plaincopy to clipboardprint?
+*/
+   1. $start = microtime(true);  
+   2. // keep calling microtime for about 3 seconds  
+   3. while(microtime(true) - $start < 3) {  
+   4.   
+   5. }  
+   6.   
+   7. $data = getrusage();  
+   8. echo "User time: ".  
+   9.     ($data['ru_utime.tv_sec'] +  
+  10.     $data['ru_utime.tv_usec'] / 1000000);  
+  11. echo "System time: ".  
+  12.     ($data['ru_stime.tv_sec'] +  
+  13.     $data['ru_stime.tv_usec'] / 1000000);  
+  14.   
+  15. /* prints 
+  16. User time: 1.088171 
+  17. System time: 1.675315 
+  18. */  
+
+$start = microtime(true);
+// keep calling microtime for about 3 seconds
+while(microtime(true) - $start < 3) {
+
+}
+
+$data = getrusage();
+echo "User time: ".
+	($data['ru_utime.tv_sec'] +
+	$data['ru_utime.tv_usec'] / 1000000);
+echo "System time: ".
+	($data['ru_stime.tv_sec'] +
+	$data['ru_stime.tv_usec'] / 1000000);
+
+/* prints
+User time: 1.088171
+System time: 1.675315
+*/
+/**
+Now we have quite a bit of system time usage. This is because the script calls the microtime() function many times, which performs a request through the operating system to fetch the time.
+	
+Also you may notice the numbers do not quite add up to 3 seconds. This is because there were probably other processes on the server as well, and the script was not using 100% CPU for the whole duration of the 3 seconds.
+
+5. Magic Constants
+
+PHP provides useful magic constants for fetching the current line number (__LINE__), file path (__FILE__), directory path (__DIR__), function name (__FUNCTION__), class name (__CLASS__), method name (__METHOD__) and namespace (__NAMESPACE__).
+
+We are not going to cover each one of these in this article, but I will show you a few use cases.
+
+    When including other scripts, it is a good idea to utilize the __FILE__ constant (or also __DIR__ , as of PHP 5.3):
+
+view plaincopy to clipboardprint?
+*/
+   1. // this is relative to the loaded script's path  
+   2. // it may cause problems when running scripts from different directories  
+   3. require_once('config/database.php'); 
+   4.  
+   5. // this is always relative to this file's path  
+   6. // no matter where it was included from  
+   7. require_once(dirname(__FILE__) . '/config/database.php');  
+
+// this is relative to the loaded script's path
+// it may cause problems when running scripts from different directories
+require_once('config/database.php');
+
+// this is always relative to this file's path
+// no matter where it was included from
+require_once(dirname(__FILE__) . '/config/database.php');
+/**
+Using __LINE__ makes debugging easier. You can track down the line numbers:
+view plaincopy to clipboardprint?
+*/
+   1. // some code  
+   2. // ...  
+   3. my_debug("some debug message", __LINE__);  
+   4. /* prints 
+   5. Line 4: some debug message 
+   6. */  
+   7.   
+   8. // some more code  
+   9. // ...  
+  10. my_debug("another debug message", __LINE__);  
+  11. /* prints 
+  12. Line 11: another debug message 
+  13. */  
+  14.   
+  15. function my_debug($msg, $line) {  
+  16.     echo "Line $line: $msg\n";  
+  17. }  
+
+// some code
+// ...
+my_debug("some debug message", __LINE__);
+/* prints
+Line 4: some debug message
+*/
+
+// some more code
+// ...
+my_debug("another debug message", __LINE__);
+/* prints
+Line 11: another debug message
+*/
+
+function my_debug($msg, $line) {
+	echo "Line $line: $msg\n";
+}
+/**
+6. Generating Unique ID's
+
+There may be situations where you need to generate a unique string. I have seen many people use the md5() function for this, even though it's not exactly meant for this purpose:
+view plaincopy to clipboardprint?
+*/
+   1. // generate unique string  
+   2. echo md5(time() . mt_rand(1,1000000));  
+
+// generate unique string
+echo md5(time() . mt_rand(1,1000000));
+
+There is actually a PHP function named uniqid() that is meant to be used for this.
+view plaincopy to clipboardprint?
+
+   1. // generate unique string  
+   2. echo uniqid();  
+   3. /* prints 
+   4. 4bd67c947233e 
+   5. */  
+   6.   
+   7. // generate another unique string  
+   8. echo uniqid();  
+   9. /* prints 
+  10. 4bd67c9472340 
+  11. */  
+
+// generate unique string
+echo uniqid();
+/* prints
+4bd67c947233e
+*/
+
+// generate another unique string
+echo uniqid();
+/* prints
+4bd67c9472340
+*/
+/**
+You may notice that even though the strings are unique, they seem similar for the first several characters. This is because the generated string is related to the server time. This actually has a nice side effect, as every new generated id comes later in alphabetical order, so they can be sorted.
+
+To reduce the chances of getting a duplicate, you can pass a prefix, or the second parameter to increase entropy:
+view plaincopy to clipboardprint?
+*/
+   1. // with prefix  
+   2. echo uniqid('foo_');  
+   3. /* prints 
+   4. foo_4bd67d6cd8b8f 
+   5. */  
+   6.   
+   7. // with more entropy  
+   8. echo uniqid('',true);  
+   9. /* prints 
+  10. 4bd67d6cd8b926.12135106 
+  11. */  
+  12.   
+  13. // both  
+  14. echo uniqid('bar_',true);  
+  15. /* prints 
+  16. bar_4bd67da367b650.43684647 
+  17. */  
+
+// with prefix
+echo uniqid('foo_');
+/* prints
+foo_4bd67d6cd8b8f
+*/
+
+// with more entropy
+echo uniqid('',true);
+/* prints
+4bd67d6cd8b926.12135106
+*/
+
+// both
+echo uniqid('bar_',true);
+/* prints
+bar_4bd67da367b650.43684647
+*/
+
+/**
+This function will generate shorter strings than md5(), which will also save you some space.
+7. Serialization
+
+Have you ever needed to store a complex variable in a database or a text file? You do not have to come up with a fancy solution to convert your arrays or objects into formatted strings, as PHP already has functions for this purpose.
+
+There are two popular methods of serializing variables. Here is an example that uses the serialize() and unserialize():
+view plaincopy to clipboardprint?
+*/
+   1. // a complex array  
+   2. $myvar = array(  
+   3.     'hello',  
+   4.     42,  
+   5.     array(1,'two'),  
+   6.     'apple'  
+   7. );  
+   8.   
+   9. // convert to a string  
+  10. $string = serialize($myvar);  
+  11.   
+  12. echo $string;  
+  13. /* prints 
+  14. a:4:{i:0;s:5:"hello";i:1;i:42;i:2;a:2:{i:0;i:1;i:1;s:3:"two";}i:3;s:5:"apple";} 
+  15. */  
+  16.   
+  17. // you can reproduce the original variable  
+  18. $newvar = unserialize($string);  
+  19.   
+  20. print_r($newvar);  
+  21. /* prints 
+  22. Array 
+  23. ( 
+  24.     [0] => hello 
+  25.     [1] => 42 
+  26.     [2] => Array 
+  27.         ( 
+  28.             [0] => 1 
+  29.             [1] => two 
+  30.         ) 
+  31.  
+  32.     [3] => apple 
+  33. ) 
+  34. */  
+
+// a complex array
+$myvar = array(
+	'hello',
+	42,
+	array(1,'two'),
+	'apple'
+);
+
+// convert to a string
+$string = serialize($myvar);
+
+echo $string;
+/* prints
+a:4:{i:0;s:5:"hello";i:1;i:42;i:2;a:2:{i:0;i:1;i:1;s:3:"two";}i:3;s:5:"apple";}
+*/
+
+// you can reproduce the original variable
+$newvar = unserialize($string);
+
+print_r($newvar);
+/* prints
+Array
+(
+    [0] => hello
+    [1] => 42
+    [2] => Array
+        (
+            [0] => 1
+            [1] => two
+        )
+
+    [3] => apple
+)
+*/
+/**
+This was the native PHP serialization method. However, since JSON has become so popular in recent years, they decided to add support for it in PHP 5.2. Now you can use the json_encode() and json_decode() functions as well:
+view plaincopy to clipboardprint?
+*/
+   1. // a complex array  
+   2. $myvar = array(  
+   3.     'hello',  
+   4.     42,  
+   5.     array(1,'two'),  
+   6.     'apple'  
+   7. );  
+   8.   
+   9. // convert to a string  
+  10. $string = json_encode($myvar);  
+  11.   
+  12. echo $string;  
+  13. /* prints 
+  14. ["hello",42,[1,"two"],"apple"] 
+  15. */  
+  16.   
+  17. // you can reproduce the original variable  
+  18. $newvar = json_decode($string);  
+  19.   
+  20. print_r($newvar);  
+  21. /* prints 
+  22. Array 
+  23. ( 
+  24.     [0] => hello 
+  25.     [1] => 42 
+  26.     [2] => Array 
+  27.         ( 
+  28.             [0] => 1 
+  29.             [1] => two 
+  30.         ) 
+  31.  
+  32.     [3] => apple 
+  33. ) 
+  34. */  
+
+// a complex array
+$myvar = array(
+	'hello',
+	42,
+	array(1,'two'),
+	'apple'
+);
+
+// convert to a string
+$string = json_encode($myvar);
+
+echo $string;
+/* prints
+["hello",42,[1,"two"],"apple"]
+*/
+
+// you can reproduce the original variable
+$newvar = json_decode($string);
+
+print_r($newvar);
+/* prints
+Array
+(
+    [0] => hello
+    [1] => 42
+    [2] => Array
+        (
+            [0] => 1
+            [1] => two
+        )
+
+    [3] => apple
+)
+*/
+/**
+It is more compact, and best of all, compatible with javascript and many other languages. However, for complex objects, some information may be lost.
+8. Compressing Strings
+
+When talking about compression, we usually think about files, such as ZIP archives. It is possible to compress long strings in PHP, without involving any archive files.
+
+In the following example we are going to utilize the gzcompress() and gzuncompress() functions:
+view plaincopy to clipboardprint?
+*/
+   1. $string =  
+   2. "Lorem ipsum dolor sit amet, consectetur 
+   3. adipiscing elit. Nunc ut elit id mi ultricies 
+   4. adipiscing. Nulla facilisi. Praesent pulvinar, 
+   5. sapien vel feugiat vestibulum, nulla dui pretium orci, 
+   6. non ultricies elit lacus quis ante. Lorem ipsum dolor 
+   7. sit amet, consectetur adipiscing elit. Aliquam 
+   8. pretium ullamcorper urna quis iaculis. Etiam ac massa 
+   9. sed turpis tempor luctus. Curabitur sed nibh eu elit 
+  10. mollis congue. Praesent ipsum diam, consectetur vitae 
+  11. ornare a, aliquam a nunc. In id magna pellentesque 
+  12. tellus posuere adipiscing. Sed non mi metus, at lacinia 
+  13. augue. Sed magna nisi, ornare in mollis in, mollis 
+  14. sed nunc. Etiam at justo in leo congue mollis. 
+  15. Nullam in neque eget metus hendrerit scelerisque 
+  16. eu non enim. Ut malesuada lacus eu nulla bibendum 
+  17. id euismod urna sodales. ";  
+  18.   
+  19. $compressed = gzcompress($string);  
+  20.   
+  21. echo "Original size: ". strlen($string)."\n";  
+  22. /* prints 
+  23. Original size: 800 
+  24. */  
+  25.   
+  26. echo "Compressed size: ". strlen($compressed)."\n";  
+  27. /* prints 
+  28. Compressed size: 418 
+  29. */  
+  30.   
+  31. // getting it back  
+  32. $original = gzuncompress($compressed);  
+ 
+$string =
+"Lorem ipsum dolor sit amet, consectetur
+adipiscing elit. Nunc ut elit id mi ultricies
+adipiscing. Nulla facilisi. Praesent pulvinar,
+sapien vel feugiat vestibulum, nulla dui pretium orci,
+non ultricies elit lacus quis ante. Lorem ipsum dolor
+sit amet, consectetur adipiscing elit. Aliquam
+pretium ullamcorper urna quis iaculis. Etiam ac massa
+sed turpis tempor luctus. Curabitur sed nibh eu elit
+mollis congue. Praesent ipsum diam, consectetur vitae
+ornare a, aliquam a nunc. In id magna pellentesque
+tellus posuere adipiscing. Sed non mi metus, at lacinia
+augue. Sed magna nisi, ornare in mollis in, mollis
+sed nunc. Etiam at justo in leo congue mollis.
+Nullam in neque eget metus hendrerit scelerisque
+eu non enim. Ut malesuada lacus eu nulla bibendum
+id euismod urna sodales. ";
+
+$compressed = gzcompress($string);
+
+echo "Original size: ". strlen($string)."\n";
+/* prints
+Original size: 800
+*/
+
+echo "Compressed size: ". strlen($compressed)."\n";
+/* prints
+Compressed size: 418
+*/
+
+// getting it back
+$original = gzuncompress($compressed);
+/**
+We were able to achive almost 50% size reduction. Also the functions gzencode() and gzdecode() achive similar results, by using a different compression algorithm.
+9. Register Shutdown Function
+
+There is a function called register_shutdown_function(), which will let you execute some code right before the script finishes running.
+
+Imagine that you want to capture some benchmark statistics at the end of your script execution, such as how long it took to run:
+view plaincopy to clipboardprint?
+*/
+   1. // capture the start time  
+   2. $start_time = microtime(true);  
+   3.   
+   4. // do some stuff  
+   5. // ...  
+   6.   
+   7. // display how long the script took  
+   8. echo "execution took: ".  
+   9.         (microtime(true) - $start_time).  
+  10.         " seconds.";  
+
+// capture the start time
+$start_time = microtime(true);
+
+// do some stuff
+// ...
+
+// display how long the script took
+echo "execution took: ".
+		(microtime(true) - $start_time).
+		" seconds.";
+/**
+At first this may seem trivial. You just add the code to the very bottom of the script and it runs before it finishes. However, if you ever call the exit() function, that code will never run. Also, if there is a fatal error, or if the script is terminated by the user (by pressing the Stop button in the browser), again it may not run.
+
+When you use register_shutdown_function(), your code will execute no matter why the script has stopped running:
+view plaincopy to clipboardprint?
+*/
+   1. $start_time = microtime(true);  
+   2.   
+   3. register_shutdown_function('my_shutdown');  
+   4.   
+   5. // do some stuff  
+   6. // ...  
+   7.   
+   8. function my_shutdown() {  
+   9.     global $start_time;  
+  10.   
+  11.     echo "execution took: ".  
+  12.             (microtime(true) - $start_time).  
+  13.             " seconds.";  
+  14. }  
+/**  
+Conclusion
+
+Are you aware of any other PHP features that are not widely known but can be quite useful? 
+Please share with us in the comments. And thank you for reading! 
+*/

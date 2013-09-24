@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:stretchColumns="1">
+    <!-- android:stretchColumns  当一行中的所有列的内容不能把这一行填满时，指定把第几列拉伸用来填满父控制，列从0开始。-->
+    <TableRow>
+        <TextView
+            android:text="@string/row1_column1"
+            android:background="#aa0000"
+            android:padding="3dip" />
+        <TextView
+        	android:text="@string/row1_column1"
+        	android:padding="3dip"
+        	android:gravity="center_horizontal"
+            android:background="#00aa00"
+        	></TextView>
+        <TextView
+            android:text="@string/row1_column2"
+            android:gravity="right"
+            android:background="#0000aa"
+            android:padding="3dip" />
+    </TableRow>
+
+    <TableRow>
+        <TextView
+            android:text="@string/row2_column1"
+            android:padding="3dip" />
+        <TextView
+            android:text="@string/row2_column2"
+            android:gravity="right"
+            android:padding="3dip" />
+    </TableRow>
+</TableLayout>

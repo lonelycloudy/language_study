@@ -1,0 +1,60 @@
+####Á·Ï°1
+[root@localhost 121219]# cat Fillvector.cpp 
+//Fillvector.cpp
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <vector>
+//g++ -oFill Fillvector.cpp
+using namespace std;
+
+int main(){
+    vector <string> vec;
+    ifstream in(if,"Fillvector.cpp") ;
+    while(getline(if,line))
+    vec.push_back(line);//push line to the end
+    for(int i=0;i<vec.size();i++) 
+        cout << vec[i]<< endl;
+   return 0; 
+}
+###Faq1
+[root@localhost 121219]# g++ -oFillvector ./Fillvector.cpp 
+./Fillvector.cpp: In function ¡®int main()¡¯:
+./Fillvector.cpp:11: ´íÎó£ºexpected primary-expression before ¡®if¡¯
+./Fillvector.cpp:12: ´íÎó£ºexpected primary-expression before ¡®if¡¯
+./Fillvector.cpp:12: ´íÎó£º¡®line¡¯ ÔÚ´Ë×÷ÓÃÓòÖÐÉÐÎ´ÉùÃ÷
+##Fixed1
+  ifstream in(if,"Fillvector.cpp") ;
+  string line;//Î´¶¨Òå
+    while(getline(if,line))
+###Faq2
+[root@localhost 121219]# g++ -oFillvector ./Fillvector.cpp 
+./Fillvector.cpp: In function ¡®int main()¡¯:
+./Fillvector.cpp:11: ´íÎó£ºexpected primary-expression before ¡®if¡¯
+./Fillvector.cpp:13: ´íÎó£ºexpected primary-expression before ¡®if¡¯	
+###Fixed2
+    ifstream in("Fillvector.cpp");
+    string line;
+    while(getline(in,line))
+##
+[root@localhost 121219]# g++ -oFill ./Fillvector.cpp 
+[root@localhost 121219]# ./Fill
+//Fillvector.cpp
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <vector>
+//g++ -oFill Fillvector.cpp
+using namespace std;
+
+int main(){
+    vector <string> vec;
+    ifstream in("Fillvector.cpp");
+    string line;
+    while(getline(in,line))
+    vec.push_back(line);//push line to the end
+    for(int i=0;i<vec.size();i++) 
+        cout << vec[i]<< endl;
+   return 0; 
+}
+#####Á·Ï°2

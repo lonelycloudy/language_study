@@ -1,0 +1,6 @@
+http://blog.chinaunix.net/uid-20548989-id-1667520.html
+##
+http://code.google.com/p/skipfish/downloads/detail?name=skipfish-2.10b.tgz&can=2&q=
+##http://skipfish.googlecode.com/files/skipfish-2.10b.tgz
+[root@localhost secure_study]# wget http://skipfish.googlecode.com/files/skipfish-2.10b.tgz
+[root@localhost secure_study]# tar -zxvf skipfish-2.10b.tgz 

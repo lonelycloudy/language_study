@@ -1,0 +1,25 @@
+;
+    168 ; Safe Mode
+    169 ;
+    170 safe_mode = Off
+    171 
+    172 ; By default, Safe Mode does a UID compare check when
+    173 ; opening files. If you want to relax this to a GID compare,
+    174 ; then turn on safe_mode_gid.
+    175 safe_mode_gid = Off
+    176 
+    177 ; When safe_mode is on, UID/GID checks are bypassed when
+    178 ; including files from this directory and its subdirectories.
+    179 ; (directory must also be in include_path or full path must
+    180 ; be used when including)
+    181 safe_mode_include_dir =
+    182 
+    183 ; When safe_mode is on, only executables located in the safe_mode_exec_dir
+    184 ; will be allowed to be executed via the exec family of functions.
+    185 safe_mode_exec_dir =
+    186 
+    187 ; Setting certain environment variables may be a potential security breach.
+    188 ; This directive contains a comma-delimited list of prefixes.  In Safe Mode,
+    189 ; the user may only alter environment variables whose names begin with the
+    190 ; prefixes supplied here.  By default, users will only be able to set
+    191 ; environment variables that begin with PHP_ (e.g. PHP_FOO=BAR).

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, FirstActivity!</string>
+    <string name="app_name">task</string>
+    <string name="first">FirstActivity</string>
+    <string name="second">SecondActivity</string>
+    <string name="third">ThirdActivity</string>
+    <string name="firstButton">FirstButton</string>
+    <string name="secondButton">SecondButton</string>
+    <string name="thirdButton">ThirdButton</string>
+</resources>

@@ -1,0 +1,5 @@
+﻿string(314) "{"channel":"cn.com.sina.tech","seedURL":"http:\/\/tech.sina.com.cn\
+/tele\/","urlPattern":["http:\/\/tech\\.sina\\.com\\.cn\/t\/\\w\/\\d+-\\d+-\\d+\
+\d+\\.shtml","http:\/\/tech\\.sina\\.com\\.cn\/t\/\\d+-\\d+-\\d+\\d+\\.shtml"],"
+ruleList":{"title":"id:artibodyTitle","pubdate":"id:pub_date","content":"id:arti
+body"}}"
